@@ -1,3 +1,4 @@
+import gc
 import html
 import json
 import os
@@ -38,26 +39,28 @@ def run():
 
     while cap.isOpened():
         ret, frame = cap.read()
-        if ret:
-            frame = cv2.resize(frame, (0, 0), fx=ratio, fy=1)
-            frame = frame[495:545, 80:380]
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            text = pytesseract.image_to_string(frame).strip()
-
-            if editdistance.eval('EMILIO MOLINARI', text.upper()) <= 4:
-                print(f'Found at {msec_to_time(timestamp)}')
-                found.append(timestamp)
-                timestamp += 40 * 1000
-            else:
-                timestamp += 2000
-            cap.set(cv2.CAP_PROP_POS_MSEC, timestamp)
-        else:
-            cap.release()
+        if not ret:
             break
+        frame = cv2.resize(frame, (0, 0), fx=ratio, fy=1)
+        frame = frame[495:545, 80:380]
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        text = pytesseract.image_to_string(frame).strip()
+
+        if editdistance.eval('EMILIO MOLINARI', text.upper()) <= 4:
+            print(f'Found at {msec_to_time(timestamp)}')
+            found.append(timestamp)
+            timestamp += 40 * 1000
+        else:
+            timestamp += 2000
+        cap.set(cv2.CAP_PROP_POS_MSEC, timestamp)
+
+    cap.release()
 
     send_message(found, title)
 
     print(f'Done at {datetime.now().isoformat()}')
+
+    gc.collect()
 
 
 def send_message(found: list, title: str):
