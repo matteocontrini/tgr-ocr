@@ -82,12 +82,8 @@ def send_message(found: list, title: str):
 
 
 def msec_to_time(msec):
-    sec = msec / 1000
-    min = sec / 60
-    sec = sec % 60
-    hour = min / 60
-    min = min % 60
-    return f'{hour:02.0f}:{min:02.0f}:{sec:02.0f}'
+    seconds = int(msec / 1000)
+    return f'{seconds // 60:02}:{seconds % 60:02}'
 
 
 if __name__ == '__main__':
