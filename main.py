@@ -2,14 +2,14 @@ import html
 import json
 import os
 import re
-import time
 from datetime import datetime
 
 import cv2
 import editdistance
 import pytesseract
 import requests
-import schedule
+from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 BOT_TOKEN = os.environ['BOT_TOKEN']
 
@@ -43,7 +43,6 @@ def run():
             frame = frame[495:545, 80:380]
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             text = pytesseract.image_to_string(frame).strip()
-            # print(text)
 
             if editdistance.eval('EMILIO MOLINARI', text.upper()) <= 4:
                 print(f'Found at {msec_to_time(timestamp)}')
@@ -70,7 +69,6 @@ def send_message(found: list, title: str):
         for timestamp in found:
             msg += f'- {msec_to_time(timestamp)}\n'
 
-    print(msg)
     resp = requests.post(f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage', data={
         'chat_id': '-1001740623444',
         'text': msg,
@@ -90,9 +88,11 @@ def msec_to_time(msec):
 
 
 if __name__ == '__main__':
-    schedule.every().day.at('15:30', 'Europe/Rome').do(run)
-    schedule.every().day.at('21:00', 'Europe/Rome').do(run)
+    scheduler = BlockingScheduler()
+    scheduler.add_job(run, trigger=CronTrigger(hour='15', minute='20', timezone='Europe/Rome'))
+    scheduler.add_job(run, trigger=CronTrigger(hour='21', minute='00', timezone='Europe/Rome'))
 
-    while 1:
-        schedule.run_pending()
-        time.sleep(60)
+    try:
+        scheduler.start()
+    except (KeyboardInterrupt, SystemExit):
+        pass
