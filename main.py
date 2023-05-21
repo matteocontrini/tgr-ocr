@@ -41,18 +41,22 @@ def run():
         ret, frame = cap.read()
         if not ret:
             break
+
+        if cap.get(cv2.CAP_PROP_POS_MSEC) - timestamp < 2000:
+            continue
+
+        timestamp = cap.get(cv2.CAP_PROP_POS_MSEC)
+
         frame = cv2.resize(frame, (0, 0), fx=ratio, fy=1)
         frame = frame[495:545, 80:380]
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         text = pytesseract.image_to_string(frame).strip()
 
+        print(f'Processing {msec_to_time(timestamp)} -> {text}')
+
         if editdistance.eval('EMILIO MOLINARI', text.upper()) <= 4:
             print(f'Found at {msec_to_time(timestamp)}')
             found.append(timestamp)
-            timestamp += 40 * 1000
-        else:
-            timestamp += 2000
-        cap.set(cv2.CAP_PROP_POS_MSEC, timestamp)
 
     cap.release()
 
