@@ -57,6 +57,7 @@ def run():
         if editdistance.eval('EMILIO MOLINARI', text.upper()) <= 4:
             print(f'Found at {msec_to_time(timestamp)}')
             found.append(timestamp)
+            cap.set(cv2.CAP_PROP_POS_MSEC, timestamp + 40 * 1000)
 
     cap.release()
 
