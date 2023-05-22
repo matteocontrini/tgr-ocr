@@ -1,4 +1,3 @@
-import gc
 import html
 import json
 import os
@@ -64,8 +63,6 @@ def run():
     send_message(found, title)
 
     print(f'Done at {datetime.now().isoformat()}')
-
-    gc.collect()
 
 
 def send_message(found: list, title: str):
