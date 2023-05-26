@@ -91,7 +91,7 @@ def msec_to_time(msec):
 if __name__ == '__main__':
     scheduler = BlockingScheduler()
     scheduler.add_job(run, trigger=CronTrigger(hour='15', minute='20', timezone='Europe/Rome'))
-    scheduler.add_job(run, trigger=CronTrigger(hour='21', minute='00', timezone='Europe/Rome'))
+    scheduler.add_job(run, trigger=CronTrigger(hour='21', minute='10', timezone='Europe/Rome'))
 
     try:
         scheduler.start()
