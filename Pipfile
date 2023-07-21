@@ -8,8 +8,6 @@ pytesseract = "*"
 editdistance = "*"
 requests = "*"
 opencv-python = "*"
-apscheduler = "*"
-pytz = "*"
 
 [dev-packages]
 

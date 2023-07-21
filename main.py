@@ -8,8 +8,6 @@ import cv2
 import editdistance
 import pytesseract
 import requests
-from apscheduler.schedulers.blocking import BlockingScheduler
-from apscheduler.triggers.cron import CronTrigger
 
 BOT_TOKEN = os.environ['BOT_TOKEN']
 
@@ -89,11 +87,4 @@ def msec_to_time(msec):
 
 
 if __name__ == '__main__':
-    scheduler = BlockingScheduler()
-    scheduler.add_job(run, trigger=CronTrigger(hour='15', minute='20', timezone='Europe/Rome'))
-    scheduler.add_job(run, trigger=CronTrigger(hour='21', minute='15', timezone='Europe/Rome'))
-
-    try:
-        scheduler.start()
-    except (KeyboardInterrupt, SystemExit):
-        pass
+    run()
