@@ -58,7 +58,10 @@ def run():
 
     cap.release()
 
-    send_message(found, title)
+    if len(found) > 0:
+        send_message(found, title)
+    else:
+        print('Nothing found')
 
     print(f'Done at {datetime.now().isoformat()}')
 
