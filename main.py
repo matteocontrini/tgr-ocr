@@ -2,6 +2,8 @@ import html
 import json
 import os
 import re
+import shutil
+import tempfile
 from datetime import datetime
 
 import cv2
@@ -25,11 +27,15 @@ def run():
 
     title = data['title']
     content_url = data['content_url']
+    video_url = f'{content_url}&overrideUserAgentRule=mp4-*'
 
     print(f'Found "{title}"')
     print(f'Relinker: {content_url}')
+    print(f'Video URL: {video_url}')
 
-    cap = cv2.VideoCapture(content_url)
+    f = download_file(video_url)
+
+    cap = cv2.VideoCapture(f.name)
     ratio = cap.get(cv2.CAP_PROP_SAR_NUM) / cap.get(cv2.CAP_PROP_SAR_DEN)
     timestamp = 0
     found = []
@@ -57,6 +63,7 @@ def run():
             cap.set(cv2.CAP_PROP_POS_MSEC, timestamp + 40 * 1000)
 
     cap.release()
+    f.close()
 
     if len(found) > 0:
         send_message(found, title)
@@ -87,6 +94,13 @@ def send_message(found: list, title: str):
 def msec_to_time(msec):
     seconds = int(msec / 1000)
     return f'{seconds // 60:02}:{seconds % 60:02}'
+
+
+def download_file(url):
+    f = tempfile.NamedTemporaryFile()
+    with requests.get(url, headers={'User-Agent': 'Rai'}, stream=True) as r:
+        shutil.copyfileobj(r.raw, f)
+    return f
 
 
 if __name__ == '__main__':
